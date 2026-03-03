@@ -4,7 +4,7 @@ A Django REST Framework implementation investigating multi-carrier shipping rate
 
 ## Project Purpose
 
-This project follows an investigation-driven learning approach to understanding API product engineering in the logistics domain. Rather than following tutorials, I'm building a working system to understand the business constraints and technical decisions behind shipping APIs.
+This project follows an investigation-driven learning approach to understanding API product engineering in the logistics domain. I'm building a working system to understand the business constraints and technical decisions behind shipping APIs.
 
 ## Current Implementation
 
