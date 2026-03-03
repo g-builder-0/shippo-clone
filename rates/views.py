@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .models import RateRequest
-from .serializers import RateRequestSerializer
+from .models import RateRequest, Address, Parcel, Shipment
+from .serializers import RateRequestSerializer, AddressSerializer, ParcelSerializer, ShipmentSerializer
 
 
 class RateRequestViewSet(viewsets.ModelViewSet):
@@ -17,3 +17,18 @@ class RateRequestViewSet(viewsets.ModelViewSet):
         print(f"{'=' * 60}\n")
 
         return super().create(request, *args, **kwargs)
+
+
+class AddressViewSet(viewsets.ModelViewSet):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+
+
+class ParcelViewSet(viewsets.ModelViewSet):
+    queryset = Parcel.objects.all()
+    serializer_class = ParcelSerializer
+
+
+class ShipmentViewSet(viewsets.ModelViewSet):
+    queryset = Shipment.objects.all()
+    serializer_class = ShipmentSerializer
