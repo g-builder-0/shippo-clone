@@ -1,7 +1,12 @@
 from rest_framework import viewsets
-from .models import RateRequest, Address, Parcel, Shipment
-from .serializers import RateRequestSerializer, AddressSerializer, ParcelSerializer, ShipmentSerializer
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
+from .models import RateRequest, Address, Parcel, Shipment, Rate
+from .serializers import RateRequestSerializer, AddressSerializer, ParcelSerializer, ShipmentSerializer, RateSerializer
+from .carriers.fedex import FedExCarrier
+from .carriers.ups import UPSCarrier
+from .carriers.usps import USPSCarrier
 
 class RateRequestViewSet(viewsets.ModelViewSet):
     queryset = RateRequest.objects.all()
@@ -32,3 +37,42 @@ class ParcelViewSet(viewsets.ModelViewSet):
 class ShipmentViewSet(viewsets.ModelViewSet):
     queryset = Shipment.objects.all()
     serializer_class = ShipmentSerializer
+
+    @action(detail=True, methods=['post'])
+    def get_rates(self, request, pk=None):
+        """
+        Get shipping rates from all carriers for this shipment
+
+        POST /api/shipments/{id}/get_rates/
+        """
+        shipment = self.get_object()
+
+        # Initialize carriers
+        carriers = [
+            FedExCarrier(),
+            UPSCarrier(),
+            USPSCarrier(),
+        ]
+
+        service_levels = ['ground', 'express', 'overnight']
+
+        # Collect all rates
+        rates = []
+        for carrier in carriers:
+            for service_level in service_levels:
+                # Calculate rate
+                rate_data = carrier.calculate_rate(shipment, service_level)
+
+                # Create Rate object
+                rate = Rate.objects.create(
+                    shipment=shipment,
+                    carrier=carrier.carrier_name,
+                    service_level=service_level,
+                    amount=rate_data['amount'],
+                    estimated_days=rate_data['estimated_days']
+                )
+                rates.append(rate)
+
+        # Serialize and return
+        serializer = RateSerializer(rates, many=True)
+        return Response(serializer.data)

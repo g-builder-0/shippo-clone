@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import RateRequest, Address, Parcel, Shipment
+from .models import RateRequest, Address, Parcel, Shipment, Rate
 
 
 class RateRequestSerializer(serializers.ModelSerializer):
@@ -49,4 +49,13 @@ class ShipmentSerializer(serializers.ModelSerializer):
             'id', 'address_from', 'address_to', 'parcel',
             'address_from_id', 'address_to_id', 'parcel_id',
             'created_at', 'updated_at'
+        ]
+
+
+class RateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rate
+        fields = [
+            'id', 'carrier', 'service_level', 'amount',
+            'currency', 'estimated_days', 'created_at'
         ]

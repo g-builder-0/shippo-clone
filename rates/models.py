@@ -82,3 +82,33 @@ class Shipment(models.Model):
 
     def __str__(self):
         return f"Shipment {self.id}: {self.address_from.city} → {self.address_to.city}"
+
+
+class Rate(models.Model):
+    """Shipping rate quote from a carrier"""
+
+    CARRIER_CHOICES = [
+        ('fedex', 'FedEx'),
+        ('ups', 'UPS'),
+        ('usps', 'USPS'),
+    ]
+
+    SERVICE_LEVEL_CHOICES = [
+        ('ground', 'Ground'),
+        ('express', 'Express Saver'),
+        ('overnight', 'Overnight'),
+    ]
+
+    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE, related_name='rates')
+    carrier = models.CharField(max_length=20, choices=CARRIER_CHOICES)
+    service_level = models.CharField(max_length=20, choices=SERVICE_LEVEL_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=3, default='USD')
+    estimated_days = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.carrier} {self.service_level}: ${self.amount}"
+
+    class Meta:
+        ordering = ['amount']  # Cheapest first by default
