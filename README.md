@@ -21,11 +21,19 @@ This project follows an investigation-driven learning approach to understanding 
 - Nested serializers for read/write operations
 - API endpoints for addresses, parcels, and shipments
 
+### Phase 3: Multi-Carrier Rate Shopping ✅ Complete
+- Rate model with carrier and service level fields
+- Mock carrier classes (FedEx, UPS, USPS) with pricing logic
+- Distance and weight-based rate calculation
+- Rate shopping endpoint returning sorted options from all carriers
+- Comparison of 9 different shipping options per shipment
+
 **Current Endpoints:**
 - `POST /api/rates/` - Rate management
 - `POST /api/addresses/` - Address CRUD
 - `POST /api/parcels/` - Parcel CRUD
 - `POST /api/shipments/` - Create shipments linking addresses and parcels
+- `POST /api/shipments/{id}/get_rates/` - Get rates from all carriers
 
 **Example: Create a Shipment**
 
@@ -72,6 +80,44 @@ Response (with nested data):
 }
 ```
 
+**Example: Get Rates for a Shipment**
+
+Request:
+```json
+POST /api/shipments/2/get_rates/
+```
+
+Response (9 rates sorted by price):
+```json
+[
+    {
+        "id": 7,
+        "carrier": "usps",
+        "service_level": "ground",
+        "amount": "7.69",
+        "currency": "USD",
+        "estimated_days": 7
+    },
+    {
+        "id": 4,
+        "carrier": "ups",
+        "service_level": "ground",
+        "amount": "9.42",
+        "currency": "USD",
+        "estimated_days": 5
+    },
+    {
+        "id": 1,
+        "carrier": "fedex",
+        "service_level": "ground",
+        "amount": "10.11",
+        "currency": "USD",
+        "estimated_days": 4
+    },
+    ...
+]
+```
+
 ## Tech Stack
 
 - **Django 6.0** - Web framework
@@ -109,8 +155,9 @@ python manage.py runserver
 ```
 
 6. Access the API
-- Browsable API: http://localhost:8000/api/addresses/
+- Browsable API: http://localhost:8000/api/shipments/
 - Create addresses, parcels, and shipments through the interface
+- Test rate shopping: http://localhost:8000/api/shipments/{id}/get_rates/
 
 ## Key Features
 
@@ -120,6 +167,13 @@ The API uses DRF's nested serializer pattern:
 - **Read operations:** Return full nested objects with complete details
 
 This mirrors how production APIs like Shippo work - simple input, detailed output.
+
+### Multi-Carrier Rate Shopping
+The rate shopping engine simulates how aggregators like Shippo work:
+- Single API call returns rates from multiple carriers
+- Pricing based on distance, weight, and service level
+- Automatic sorting by price (cheapest first)
+- Enables customers to compare options and choose best fit
 
 ### Model Relationships
 Uses Django ForeignKey relationships to link shipments to addresses and parcels, enabling efficient queries and data integrity.
