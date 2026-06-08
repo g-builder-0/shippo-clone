@@ -102,7 +102,8 @@ class Rate(models.Model):
     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE, related_name='rates')
     carrier = models.CharField(max_length=20, choices=CARRIER_CHOICES)
     service_level = models.CharField(max_length=20, choices=SERVICE_LEVEL_CHOICES)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_carrier = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_charged = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=3, default='USD')
     estimated_days = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -111,4 +112,4 @@ class Rate(models.Model):
         return f"{self.carrier} {self.service_level}: ${self.amount}"
 
     class Meta:
-        ordering = ['amount']  # Cheapest first by default
+        ordering = ['amount_charged']  # Cheapest first by default

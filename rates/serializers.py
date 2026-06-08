@@ -56,6 +56,6 @@ class RateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rate
         fields = [
-            'id', 'carrier', 'service_level', 'amount',
+            'id', 'carrier', 'service_level', 'amount_carrier', 'amount_charged',
             'currency', 'estimated_days', 'created_at'
         ]

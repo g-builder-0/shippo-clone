@@ -68,7 +68,8 @@ class ShipmentViewSet(viewsets.ModelViewSet):
                     shipment=shipment,
                     carrier=carrier.carrier_name,
                     service_level=service_level,
-                    amount=rate_data['amount'],
+                    amount_carrier=rate_data['amount_carrier'],
+                    amount_charged=rate_data['amount_charged'],
                     estimated_days=rate_data['estimated_days']
                 )
                 rates.append(rate)

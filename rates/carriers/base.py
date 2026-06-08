@@ -52,8 +52,18 @@ class BaseCarrier:
         # Round to 2 decimal places
         rate = rate.quantize(Decimal('0.01'))
 
+        MARGINS = {
+            'ground': Decimal('0.08'),
+            'express': Decimal('0.15'),
+            'overnight': Decimal('0.15'),
+        }
+
+        margin = MARGINS[service_level]
+        amount_charged = (rate * (1 + margin)).quantize(Decimal('0.01'))
+
         return {
-            'amount': rate,
+            'amount_carrier': rate,
+            'amount_charged': amount_charged,
             'estimated_days': self.DELIVERY_DAYS[service_level]
         }
 

@@ -1,0 +1,60 @@
+### 1. Create address (origin)
+POST http://localhost:8000/api/addresses/
+Content-Type: application/json
+
+{
+  "name": "John Sender",
+  "street1": "123 Main St",
+  "city": "Chicago",
+  "state": "IL",
+  "zip_code": "60601",
+  "is_residential": false
+}
+
+###
+
+### 2. Create address (destination)
+POST http://localhost:8000/api/addresses/
+Content-Type: application/json
+
+{
+  "name": "Jane Receiver",
+  "street1": "456 Oak Ave",
+  "city": "Los Angeles",
+  "state": "CA",
+  "zip_code": "90001",
+  "is_residential": true
+}
+
+###
+
+### 3. Create parcel
+POST http://localhost:8000/api/parcels/
+Content-Type: application/json
+
+{
+  "length": "12.00",
+  "width": "8.00",
+  "height": "6.00",
+  "weight": "3.50",
+  "distance_unit": "in",
+  "mass_unit": "lb"
+}
+
+###
+
+### 4. Create shipment (use IDs from above responses)
+POST http://localhost:8000/api/shipments/
+Content-Type: application/json
+
+{
+  "address_from_id": 1,
+  "address_to_id": 2,
+  "parcel_id": 1
+}
+
+###
+
+### 5. Get rates for shipment 1
+POST http://localhost:8000/api/shipments/1/get_rates/
+Content-Type: application/json
