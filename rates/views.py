@@ -2,11 +2,14 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .models import RateRequest, Address, Parcel, Shipment, Rate
-from .serializers import RateRequestSerializer, AddressSerializer, ParcelSerializer, ShipmentSerializer, RateSerializer
+from .models import RateRequest, Address, Parcel, Shipment, Rate, Transaction
+from .serializers import RateRequestSerializer, AddressSerializer, ParcelSerializer, ShipmentSerializer, RateSerializer, \
+    TransactionSerializer
 from .carriers.fedex import FedExCarrier
 from .carriers.ups import UPSCarrier
 from .carriers.usps import USPSCarrier
+from .services import LabelGenerator
+
 
 class RateRequestViewSet(viewsets.ModelViewSet):
     queryset = RateRequest.objects.all()
@@ -77,3 +80,36 @@ class ShipmentViewSet(viewsets.ModelViewSet):
         # Serialize and return
         serializer = RateSerializer(rates, many=True)
         return Response(serializer.data)
+
+class TransactionViewSet(viewsets.ModelViewSet):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+
+    def create(self, request, *args, **kwargs):
+        rate_id = request.data.get('rate_id')
+
+        try:
+            rate = Rate.objects.get(id=rate_id)
+        except Rate.DoesNotExist:
+            return Response({'error': 'Rate not found'}, status=404)
+
+        generator = LabelGenerator()
+
+        # Create transaction with pending status
+        transaction = Transaction.objects.create(
+            rate=rate,
+            status='pending',
+            amount=rate.amount_charged,
+        )
+
+        # Generate tracking number and label
+        transaction.tracking_number = generator.generate_tracking_number(rate.carrier)
+        transaction.save()
+
+        label_url = generator.generate_label(transaction)
+        transaction.label_url = label_url
+        transaction.status = 'success'
+        transaction.save()
+
+        serializer = TransactionSerializer(transaction)
+        return Response(serializer.data, status=201)

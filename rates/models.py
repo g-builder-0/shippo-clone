@@ -109,7 +109,32 @@ class Rate(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.carrier} {self.service_level}: ${self.amount}"
+        return f"{self.carrier} {self.service_level}: ${self.amount_charged}"
 
     class Meta:
         ordering = ['amount_charged']  # Cheapest first by default
+
+
+class Transaction(models.Model):
+    """
+    Records label purchases and their lifecycle.
+    Rates are quotes (temporary). Transactions are purchases (permanent).
+    """
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('success', 'Success'),
+        ('refunded', 'Refunded'),
+        ('failed', 'Failed'),
+    ]
+
+    rate = models.ForeignKey(Rate, on_delete=models.CASCADE, related_name='transactions')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    tracking_number = models.CharField(max_length=100, blank=True)
+    label_url = models.CharField(max_length=500, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Transaction {self.id}: {self.status} - {self.tracking_number}"

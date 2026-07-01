@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import RateRequest, Address, Parcel, Shipment, Rate
+from .models import RateRequest, Address, Parcel, Shipment, Rate, Transaction
 
 
 class RateRequestSerializer(serializers.ModelSerializer):
@@ -59,3 +59,12 @@ class RateSerializer(serializers.ModelSerializer):
             'id', 'carrier', 'service_level', 'amount_carrier', 'amount_charged',
             'currency', 'estimated_days', 'created_at'
         ]
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = [
+            'id', 'rate', 'status', 'tracking_number',
+            'label_url', 'amount', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['status', 'tracking_number', 'label_url', 'created_at', 'updated_at']

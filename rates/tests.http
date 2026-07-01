@@ -58,3 +58,26 @@ Content-Type: application/json
 ### 5. Get rates for shipment 1
 POST http://localhost:8000/api/shipments/1/get_rates/
 Content-Type: application/json
+
+###
+
+### 6. Create transaction (purchase a label)
+### Use a rate_id from the response to step 5
+POST http://localhost:8000/api/transactions/
+Content-Type: application/json
+
+{
+  "rate_id": 1
+}
+
+###
+
+### 7. List all transactions
+GET http://localhost:8000/api/transactions/
+Content-Type: application/json
+
+###
+
+### 8. Get a specific transaction
+GET http://localhost:8000/api/transactions/1/
+Content-Type: application/json
